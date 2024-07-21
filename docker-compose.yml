@@ -1,0 +1,28 @@
+version: '3.9'
+
+services:
+  bot:
+    build: .
+    command: python main/main.py
+    env_file:
+      - .env
+    depends_on:
+      - redis
+    volumes:
+      - .:/config/get_text/exchange_rates/main/message_handler/states
+
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"
+
+  fetcher:
+    build: .
+    command: python exchange_rates/exchange_rates.py
+    env_file:
+      - .env
+    depends_on:
+      - redis
+    volumes:
+      - .:/config/get_text/exchange_rates/main/message_handler/states
+    restart: unless-stopped
